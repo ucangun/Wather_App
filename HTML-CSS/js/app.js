@@ -1,14 +1,18 @@
 const submitButton = document.querySelector(".btn");
 const input = document.querySelector("input");
 const cities = document.querySelector(".cities");
+const msg = document.querySelector(".msg");
 
-let globalCityData = null;
+let displayedCities = new Set();
+let inputValue;
 
 submitButton.addEventListener("click", (e) => {
   e.preventDefault();
-  let inputValue = input.value;
-  getCityWeather(inputValue);
-  input.value = "";
+  inputValue = input.value;
+  if (inputValue) {
+    getCityWeather(inputValue);
+    input.value = "";
+  }
 });
 
 const getCityWeather = async (city) => {
@@ -18,21 +22,23 @@ const getCityWeather = async (city) => {
     );
 
     if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+      throw new Error(
+        `The country you entered could not be found 😔 ${res.status}`
+      );
     }
 
     const data = await res.json();
-    globalCityData = data;
     getCityCard(data);
-    console.log(data);
+    displayedCities.add(data.name);
   } catch (error) {
-    console.error("Fetch error:", error);
+    msg.textContent = `${error}`;
   }
 };
 
 const getCityCard = (data) => {
-  const listItem = document.createElement("li");
-  listItem.innerHTML += `
+  if (!displayedCities.has(data.name)) {
+    const listItem = document.createElement("li");
+    listItem.innerHTML += `
   <li class="city">
     <h2 class="city-name">${data.name} <sup>${data.sys.country}</sup></h2>
     <div class="city-temp">${data.main.temp}<sup>°C</sup></div>
@@ -44,5 +50,8 @@ const getCityCard = (data) => {
     </figure>
   </li>`;
 
-  cities.appendChild(listItem);
+    cities.appendChild(listItem);
+  } else {
+    msg.textContent = `You already know the for ${inputValue} , please search for another city 😄`;
+  }
 };
