@@ -3,7 +3,7 @@ const input = document.querySelector("input");
 const cities = document.querySelector(".cities");
 const msg = document.querySelector(".msg");
 
-let displayedCities = new Set();
+let displayedCities = [];
 let inputValue;
 
 submitButton.addEventListener("click", (e) => {
@@ -29,14 +29,14 @@ const getCityWeather = async (city) => {
 
     const data = await res.json();
     getCityCard(data);
-    displayedCities.add(data.name);
+    displayedCities.push(data.name);
   } catch (error) {
     msg.textContent = `${error}`;
   }
 };
 
 const getCityCard = (data) => {
-  if (!displayedCities.has(data.name)) {
+  if (!displayedCities.includes(data.name)) {
     const listItem = document.createElement("li");
     listItem.innerHTML += `
   <li class="city">
